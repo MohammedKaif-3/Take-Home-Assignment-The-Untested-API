@@ -89,4 +89,22 @@ describe('taskService', () => {
       expect(taskService.completeTask('missing-id')).toBeNull();
     });
   });
+
+  describe('assignment', () => {
+    it('stores an assignee and permits reassignment', () => {
+      const task = taskService.create({ title: 'Assign task' });
+
+      expect(taskService.assignTask(task.id, 'Ada Lovelace')).toMatchObject({
+        id: task.id,
+        assignee: 'Ada Lovelace',
+      });
+      expect(taskService.assignTask(task.id, 'Grace Hopper')).toMatchObject({
+        assignee: 'Grace Hopper',
+      });
+    });
+
+    it('returns null when assigning an unknown task', () => {
+      expect(taskService.assignTask('missing-id', 'Ada Lovelace')).toBeNull();
+    });
+  });
 });
