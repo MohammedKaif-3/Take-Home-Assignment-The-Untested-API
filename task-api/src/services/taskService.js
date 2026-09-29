@@ -9,7 +9,8 @@ const findById = (id) => tasks.find((t) => t.id === id);
 const getByStatus = (status) => tasks.filter((t) => t.status.includes(status));
 
 const getPaginated = (page, limit) => {
-  const offset = page * limit;
+  // The public API treats page numbers as one-based, so page 1 starts at index 0.
+  const offset = (page - 1) * limit;
   return tasks.slice(offset, offset + limit);
 };
 
