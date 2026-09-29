@@ -12,6 +12,12 @@ npm test
 npm run coverage
 ```
 
+## Live API
+
+The deployed API is available at:
+
+https://take-home-assignment-the-untested-api-6ght.onrender.com
+
 ## Bugs Found And Fixed
 
 ### Pagination skipped the first page
