@@ -134,6 +134,46 @@ describe('Task routes', () => {
     });
   });
 
+  describe('PATCH /tasks/:id/assign', () => {
+    it('assigns a task and replaces an existing assignee', async () => {
+      const task = await createTask();
+
+      const assigned = await request(app)
+        .patch(`/tasks/${task.id}/assign`)
+        .send({ assignee: '  Ada Lovelace  ' });
+      const reassigned = await request(app)
+        .patch(`/tasks/${task.id}/assign`)
+        .send({ assignee: 'Grace Hopper' });
+
+      expect(assigned.status).toBe(200);
+      expect(assigned.body).toMatchObject({ id: task.id, assignee: 'Ada Lovelace' });
+      expect(reassigned.status).toBe(200);
+      expect(reassigned.body).toMatchObject({ id: task.id, assignee: 'Grace Hopper' });
+    });
+
+    it.each([
+      [{}, 'assignee is required and must be a non-empty string'],
+      [{ assignee: '   ' }, 'assignee is required and must be a non-empty string'],
+      [{ assignee: 42 }, 'assignee is required and must be a non-empty string'],
+    ])('rejects invalid assignee data: %j', async (body, error) => {
+      const task = await createTask();
+
+      const response = await request(app).patch(`/tasks/${task.id}/assign`).send(body);
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ error });
+    });
+
+    it('returns 404 when assigning an unknown task', async () => {
+      const response = await request(app)
+        .patch('/tasks/unknown/assign')
+        .send({ assignee: 'Ada Lovelace' });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ error: 'Task not found' });
+    });
+  });
+
   describe('GET /tasks/stats', () => {
     it('returns status totals and overdue count', async () => {
       await createTask({ dueDate: '2020-01-01T00:00:00.000Z' });
